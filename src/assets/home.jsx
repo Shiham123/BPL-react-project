@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
+import Cart from './cart';
 
 const Home = () => {
   const [allActors, setAllActors] = useState([]);
-  const [selectedActors, setAllSelectedActors] = useState([]);
+  const [selectedActors, setSelectedActors] = useState([]);
+  const [totalCost, setTotalCost] = useState(0);
+  const [remainingCost, setRemainingCost] = useState(0);
 
   useEffect(() => {
     fetch('/public/data.json')
@@ -12,7 +15,25 @@ const Home = () => {
   }, []);
 
   const handleSelectActor = (actor) => {
-    setAllSelectedActors(actor);
+    const exitsUser = selectedActors.find((item) => item.id == actor.id);
+    let cost = actor.salary;
+
+    if (exitsUser) {
+      return alert('already added');
+    } else {
+      selectedActors.forEach((item) => {
+        cost = cost + item.salary;
+      });
+
+      const remaining = 20000 - cost;
+      if (cost > 20000) {
+        return alert('bigger the budget');
+      } else {
+        setRemainingCost(remaining);
+        setTotalCost(cost);
+        setSelectedActors([...selectedActors, actor]);
+      }
+    }
   };
 
   return (
@@ -34,6 +55,11 @@ const Home = () => {
           </div>
         );
       })}
+      <Cart
+        selectedActors={selectedActors}
+        totalCost={totalCost}
+        remainingCost={remainingCost}
+      />
     </div>
   );
 };
